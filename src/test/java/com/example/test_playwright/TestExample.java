@@ -8,13 +8,16 @@ import com.microsoft.playwright.*;
 import com.microsoft.playwright.assertions.LocatorAssertions;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.SelectOption;
+import com.microsoft.playwright.options.Timing;
 import org.testng.annotations.*;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 
 import static com.example.test_playwright.Constants.*;
 import static org.testng.Assert.*;
@@ -34,6 +37,7 @@ public class TestExample {
 
     @BeforeClass
     void launchBrowser() {
+//        System.out.println("@BeforeClass");
         env.put("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD","1"); // For doesn't download Chromium - use Local(already downloaded) version.
         playwright = Playwright.create(new Playwright.CreateOptions().setEnv(env));
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
@@ -47,10 +51,27 @@ public class TestExample {
         playwright.close();
     }
 
+/*
+    @BeforeSuite
+    void startBrowser() {
+        System.out.println("@BeforeSuite");
+    }
+*/
+
     @BeforeMethod
     void createContextAndPage() throws InterruptedException {
+//        System.out.println("@BeforeMethod");
         context = browser.newContext();
         page = context.newPage();
+
+        page.onRequestFinished(request -> {
+            Timing timing = request.timing();
+//            System.out.println(timing.responseEnd - timing.startTime);
+            System.out.println(LocalDateTime.ofInstant(Instant.ofEpochMilli((long) (timing.startTime)),
+                    ZoneOffset.ofHours(4)) + " : " + timing.responseEnd + " ms.\t" + request.url());
+        });
+
+// @Enter to Tekila
         page.navigate(LOGIN_PATH);
 // Enter Login Page
         Locator login = page.locator("#usr");
@@ -94,29 +115,24 @@ public class TestExample {
 */
     @Test
     void shouldOpenBBTV() throws InterruptedException {
-        Thread.sleep(DELAY_MS);
+//        Thread.sleep(DELAY_MS);
 // Click on the "New Billing UI Test env" Button
-        Locator newBillingUi = page.getByText("New Billing UI Test env");
+        Locator newBillingUi = page.getByText("Billing UI 138");
         newBillingUi.click();
-        Thread.sleep(DELAY_MS);
-
 // Click on the "Add" Dropdown(Listbox)
         Locator spanAdd = page.getByText("Add");
         spanAdd.click();
-        Thread.sleep(DELAY_MS);
 // Click on the "Individual" Element from Listbox
         Locator spanIndividual = page.getByText("Individual");
         spanIndividual.click();
-        Thread.sleep(DELAY_MS);
 // Click on the "Choose a Provider" Button
         Locator spanChooseProvider = page.getByText("Choose a Provider");
         spanChooseProvider.click();
-        Thread.sleep(DELAY_MS);
-
 // Check that BBTV provider exists, otherwise get Screenshot
 
 
         Integer bbtvProvider = page.getByText(PROVIDER_NAME).count();
+        List<String> providersList = page.getByText("").allInnerTexts();
         if(bbtvProvider == 0){
             page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("Provider " + PROVIDER_NAME +" Not Found.png")));
 //          make changes in Excel and Exit
