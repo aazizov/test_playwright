@@ -1,7 +1,6 @@
 package org.example.test_playwright;
 
 public class Constants {
-    public static final String CHROMIUM_PATH = "D:\\Bin\\chrome-win\\chrome.exe";
     public static final Boolean INVISIBILITY = false; // true;
     public static final Integer DELAY_MS = 100;
 
