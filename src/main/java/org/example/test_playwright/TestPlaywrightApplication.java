@@ -4,14 +4,17 @@ import com.microsoft.playwright.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.example.test_playwright.Constants.*;
+import static org.example.test_playwright.Constants.CHROMIUM_PATH;
 
 @SpringBootApplication
 @RestController
@@ -23,6 +26,20 @@ public class TestPlaywrightApplication {
 
     Playwright playwright = InitializePlaywright();
 
+    @PostMapping("/file_xls")
+    public String file_xls(@RequestParam(value = "file_path", defaultValue = "World") String file_path,
+                           @RequestParam(value = "mySurname", defaultValue = "World") String surname,
+                           @RequestParam(value = "headless", defaultValue = "false") Boolean headless) {
+        return String.format("Hello %s %s!", file_path, surname);
+    }
+
+    @PostMapping("/file_feature")
+    public String file_feature(@RequestParam(value = "file_path", defaultValue = "World") String file_path,
+                               @RequestParam(value = "mySurname", defaultValue = "World") String surname,
+                               @RequestParam(value = "headless", defaultValue = "false") Boolean headless) {
+        return String.format("Hello %s %s!", file_path, surname );
+    }
+
     @GetMapping("/hello")
     public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name,
                            @RequestParam(value = "mySurname", defaultValue = "World") String surname) {
@@ -32,7 +49,7 @@ public class TestPlaywrightApplication {
     @GetMapping("/browser_launch")
     public String browser_launch(@RequestParam(value = "browser", defaultValue = "chromium") String name,
 //    public <Browser, BrowserContext, Page> browser_launch(@RequestParam(value = "browser", defaultValue = "chromium") String name,
-                           @RequestParam(value = "headless", defaultValue = "false") Boolean value) {
+                                 @RequestParam(value = "headless", defaultValue = "false") Boolean value) {
         Browser browser;
         BrowserContext context;
         Page page;
